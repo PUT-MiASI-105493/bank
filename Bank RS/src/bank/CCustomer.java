@@ -56,4 +56,9 @@ public class CCustomer
 	   return bank.getPayInsGreatherThan(payIn);
    }
    
+   public List<IOperation> getTransfersGreatherThan(double payIn)
+   {
+	   return bank.getTransfersGreatherThan(payIn);
+   }
+   
 }

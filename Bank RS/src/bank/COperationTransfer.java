@@ -16,6 +16,11 @@ public class COperationTransfer implements IOperation
         dateOrder = order;
     }
 
+    public double getAmount()
+    {
+    	return amount;
+    }
+    
     public void execute(CAccount from)
     {
         from.substrMoney(amount);

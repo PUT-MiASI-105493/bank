@@ -126,4 +126,15 @@ public class CBank implements IBank, IBankUtility{
  			   ret.add(v);
  	   return ret;   
     }
+    
+    public List<IOperation> getTransfersGreatherThan(double payIn)
+    {
+ 	   IRaport rep = new CRaportTransfersGreaterThan(payIn);
+ 	   List<IOperation> ret = new ArrayList<IOperation>();
+ 	   for(IOperation v : operations)
+ 		   if(v.accept(rep))
+ 			   ret.add(v);
+ 	   return ret;   
+    }
+    
 }
