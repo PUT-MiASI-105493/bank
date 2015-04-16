@@ -1,6 +1,7 @@
 package bank;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class CCustomer 
@@ -9,13 +10,15 @@ public class CCustomer
     private String surname; 
     private int id;
     private List<Integer> accountsID;
+    private CBank bank;
 
-    public CCustomer(String name, String surname, int id)
+    public CCustomer(String name, String surname, int id, CBank bankInstance)
     {
         this.accountsID = new ArrayList<Integer>();
         this.name = name;
         this.surname = surname;
         this.id = id;
+        this.bank = bankInstance;
     }
 
    public int GetCustomerID()
@@ -42,4 +45,15 @@ public class CCustomer
    {
        accountsID.add(id);
    }
+   
+   public List<IOperation> getTransfersFromDate(Date dateFrom)
+   {
+	   return bank.getTransfersFromDate(dateFrom);
+   }
+   
+   public List<IOperation> getPayInsGreatherThan(double payIn)
+   {
+	   return bank.getPayInsGreatherThan(payIn);
+   }
+   
 }
