@@ -61,4 +61,9 @@ public class CCustomer
 	   return bank.getTransfersGreatherThan(payIn);
    }
    
+   public boolean tryWithDrawNormal(double money, int accountID)
+   {
+	   return bank.tryWithDrawNormal(money, accountID);
+   }
+   
 }

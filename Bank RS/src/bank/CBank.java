@@ -137,4 +137,43 @@ public class CBank implements IBank, IBankUtility{
  	   return ret;   
     }
     
+    public boolean tryWithDrawNormal(double money, int accountID)
+    {
+    	boolean flag = true;
+    	int i=0;
+    	CAccount ac = null;;
+    	while(flag || i==accounts.size())
+    	{
+    		if(accounts.get(i).accountID == accountID)
+    		{
+    			flag = false;
+    			ac = accounts.get(i);
+    		}
+    		else
+    			i+=1;
+    	}
+    	
+    	return ac.WithDraw(money, true);
+    	
+    }
+    
+    public boolean tryWithDrawDecorator(double money, int accountID)
+    {
+    	boolean flag = true;
+    	int i=0;
+    	CAccount ac = null;;
+    	while(flag || i==accounts.size())
+    	{
+    		if(accounts.get(i).accountID == accountID)
+    		{
+    			flag = false;
+    			ac = accounts.get(i);
+    		}
+    		else
+    			i+=1;
+    	}
+    	
+    	return new CDekoratorDebet(ac).WithDraw(money, true);	
+    }
+    
 }
