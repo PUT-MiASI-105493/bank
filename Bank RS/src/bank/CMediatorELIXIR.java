@@ -7,8 +7,7 @@ public class CMediatorELIXIR implements IMediatorELIXIR
 {
     private HashMap<Integer, CBank> banks = new HashMap<Integer, CBank>();
     
-    public void registerNewBank(CBank k)
-	{
+    public void registerNewBank(CBank k) {
         k.registerMediatorELIXIR(this);
         banks.put(k.GetBankID(), k);
     }

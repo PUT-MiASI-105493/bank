@@ -11,10 +11,10 @@ public class CBank implements IBank, IBankUtility{
     private CTransferManager transferManager;
     private List<IOperation> operations;
     private int id;
-<<<<<<< HEAD
     private CMediatorELIXIR mediator;
-=======
->>>>>>> 103288f5796feae60bb4a43a42d4d57666207e69
+    
+	CChainFilterHandle chainBegin;
+	CChainFilterHandle chainEnd;
 
     public CBank(int id, IKIRutility ku)
     {
@@ -23,8 +23,9 @@ public class CBank implements IBank, IBankUtility{
         this.customers = new ArrayList<CCustomer>();
         this.operations = new ArrayList<IOperation>();
         this.id = id;
+        
+        setChainFilter();
     }
-<<<<<<< HEAD
     
     
     public void registerMediatorELIXIR(CMediatorELIXIR mediator)
@@ -42,8 +43,6 @@ public class CBank implements IBank, IBankUtility{
     	return;
     }
     
-=======
->>>>>>> 103288f5796feae60bb4a43a42d4d57666207e69
 
     public void StoreAccount(int id, int ownerID, ITransferUtility transferUtil, IAccountState type)
     {
@@ -200,4 +199,16 @@ public class CBank implements IBank, IBankUtility{
     	return new CDekoratorDebet(ac).WithDraw(money, true);	
     }
     
+    public void setChainFilter()
+    {
+    	chainBegin = new CChainFilterHighIOperation(2000);
+    	chainEnd = new CChainFilterSameOperations();
+ 
+        chainBegin.setSuccesor(chainEnd);
+    }
+    
+    public void runChainFilter(IOperation o)
+    {
+    	chainBegin.handle(o);
+    }
 }
