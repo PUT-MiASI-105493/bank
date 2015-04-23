@@ -1,23 +1,43 @@
 package bank;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Calendar;
 
 public class CBank implements IBank, IBankUtility{
     private List<CAccount> accounts;
     private List<CCustomer> customers;
-    private List<COperation> transfer;
     private CTransferManager transferManager;
+    private List<IOperation> operations;
     private int id;
+    private CMediatorELIXIR mediator;
 
     public CBank(int id, IKIRutility ku)
     {
         this.transferManager = new CTransferManager(this, ku);
-        this.transfer = new ArrayList<COperation>();
         this.accounts = new ArrayList<CAccount>();
         this.customers = new ArrayList<CCustomer>();
+        this.operations = new ArrayList<IOperation>();
         this.id = id;
     }
+    
+    
+    public void registerMediatorELIXIR(CMediatorELIXIR mediator)
+    {
+    	this.mediator = mediator; 
+    }
+ 
+    public void sendIOperationListToELIXIR(List<IOperation> operationsToSend, int destinationBank)
+    {
+        mediator.sendIOperationsList(operationsToSend, destinationBank); // Rzeczywista komunikacja odbywa siê za poœrednictwem mediatora!!!
+    }
+ 
+    public void recieveIOperationList(List<IOperation> operationsRecieved) {
+        
+    	return;
+    }
+    
 
     public void StoreAccount(int id, int ownerID, ITransferUtility transferUtil, IAccountState type)
     {
@@ -41,7 +61,7 @@ public class CBank implements IBank, IBankUtility{
 
     public CCustomer AddCustomer(String name, String surname, int id)
     {
-        CCustomer c = new CCustomer(name, surname, id);
+        CCustomer c = new CCustomer(name, surname, id, this);
         this.customers.add(c);
         return c;
     }
@@ -91,16 +111,87 @@ public class CBank implements IBank, IBankUtility{
         return null;
     }
 
-
     public void PayIn(CAccount acc, double amount)
     {
-        IOperation oper = new COperationPayIn(amount);
+        IOperation oper = new COperationPayIn(amount, Calendar.getInstance().getTime());
         acc.DoOperation(oper);
+        operations.add(oper);
     }
 
     public void Transfer(CAccount from, CAccount to, double amount)
     {
-        IOperation oper = new COperationTransfer(to, amount);
+        IOperation oper = new COperationTransfer(to, amount, Calendar.getInstance().getTime());
         from.DoOperation(oper);
+        operations.add(oper);
     }
+    
+    public List<IOperation> getTransfersFromDate(Date dateFrom)
+    {
+ 	   IRaport rep = new CRaportTransferOnly(dateFrom);
+ 	   List<IOperation> ret = new ArrayList<IOperation>();
+ 	   for(IOperation v : operations)
+ 		   if(v.accept(rep))
+ 			   ret.add(v);
+ 	   return ret;   
+    }
+    
+    public List<IOperation> getPayInsGreatherThan(double payIn)
+    {
+ 	   IRaport rep = new CRaportPayInsGreaterThan(payIn);
+ 	   List<IOperation> ret = new ArrayList<IOperation>();
+ 	   for(IOperation v : operations)
+ 		   if(v.accept(rep))
+ 			   ret.add(v);
+ 	   return ret;   
+    }
+    
+    public List<IOperation> getTransfersGreatherThan(double payIn)
+    {
+ 	   IRaport rep = new CRaportTransfersGreaterThan(payIn);
+ 	   List<IOperation> ret = new ArrayList<IOperation>();
+ 	   for(IOperation v : operations)
+ 		   if(v.accept(rep))
+ 			   ret.add(v);
+ 	   return ret;   
+    }
+    
+    public boolean tryWithDrawNormal(double money, int accountID)
+    {
+    	boolean flag = true;
+    	int i=0;
+    	CAccount ac = null;;
+    	while(flag || i==accounts.size())
+    	{
+    		if(accounts.get(i).accountID == accountID)
+    		{
+    			flag = false;
+    			ac = accounts.get(i);
+    		}
+    		else
+    			i+=1;
+    	}
+    	
+    	return ac.WithDraw(money, true);
+    	
+    }
+    
+    public boolean tryWithDrawDecorator(double money, int accountID)
+    {
+    	boolean flag = true;
+    	int i=0;
+    	CAccount ac = null;;
+    	while(flag || i==accounts.size())
+    	{
+    		if(accounts.get(i).accountID == accountID)
+    		{
+    			flag = false;
+    			ac = accounts.get(i);
+    		}
+    		else
+    			i+=1;
+    	}
+    	
+    	return new CDekoratorDebet(ac).WithDraw(money, true);	
+    }
+    
 }
