@@ -11,7 +11,10 @@ public class CBank implements IBank, IBankUtility{
     private CTransferManager transferManager;
     private List<IOperation> operations;
     private int id;
+<<<<<<< HEAD
     private CMediatorELIXIR mediator;
+=======
+>>>>>>> 103288f5796feae60bb4a43a42d4d57666207e69
 
     public CBank(int id, IKIRutility ku)
     {
@@ -21,6 +24,7 @@ public class CBank implements IBank, IBankUtility{
         this.operations = new ArrayList<IOperation>();
         this.id = id;
     }
+<<<<<<< HEAD
     
     
     public void registerMediatorELIXIR(CMediatorELIXIR mediator)
@@ -38,6 +42,8 @@ public class CBank implements IBank, IBankUtility{
     	return;
     }
     
+=======
+>>>>>>> 103288f5796feae60bb4a43a42d4d57666207e69
 
     public void StoreAccount(int id, int ownerID, ITransferUtility transferUtil, IAccountState type)
     {
