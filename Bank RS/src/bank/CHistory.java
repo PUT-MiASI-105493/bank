@@ -5,19 +5,19 @@ import java.util.List;
 
 public class CHistory implements IHistory
 {
-    private List<COperation> operations;
+    private List<IOperation> operations;
 
     public CHistory()
     {
-        this.operations = new ArrayList<COperation>();
+        this.operations = new ArrayList<IOperation>();
     }
 
-    public void AddToHistory(COperation co)
+    public void AddToHistory(IOperation co)
     {
         operations.add(co);
     }
 
-    public List<COperation> GetOperations()
+    public List<IOperation> GetOperations()
     {
         return this.operations;
     }

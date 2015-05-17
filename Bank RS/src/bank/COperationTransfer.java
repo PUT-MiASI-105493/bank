@@ -8,11 +8,13 @@ public class COperationTransfer implements IOperation
     private double amount;
     CAccount dest;
     public Date dateOrder;
+    public boolean disposed;
 
     public COperationTransfer(CAccount to, double amount, Date order)
     {
         this.amount = amount;
         this.dest = to;
+        this.disposed = false;
         dateOrder = order;
     }
 
@@ -30,5 +32,15 @@ public class COperationTransfer implements IOperation
     public boolean accept(IRaport v)
     {
     	return v.visit(this);
+    }
+    
+    public void Dispose(boolean q)
+    {
+    	disposed = q;
+    }
+    
+    public boolean getDispose()
+    {
+    	return disposed;
     }
 }

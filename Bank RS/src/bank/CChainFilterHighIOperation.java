@@ -16,6 +16,7 @@ public class CChainFilterHighIOperation extends CChainFilterHandle
         {
             System.out.println("Za duza wartosc przelewu!");
             forward(request);
+            request.Dispose(true);
         } 
         else 
         {

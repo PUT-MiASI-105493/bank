@@ -8,17 +8,17 @@ import java.util.Calendar;
 public class CBank implements IBank, IBankUtility{
     private List<CAccount> accounts;
     private List<CCustomer> customers;
-    private CTransferManager transferManager;
     private List<IOperation> operations;
+    private List<IOperation> operationsFromOtherBank;
     private int id;
     private CMediatorELIXIR mediator;
     
 	CChainFilterHandle chainBegin;
 	CChainFilterHandle chainEnd;
 
-    public CBank(int id, IKIRutility ku)
+    public CBank(int id, CMediatorELIXIR mediator)
     {
-        this.transferManager = new CTransferManager(this, ku);
+        this.mediator = mediator;
         this.accounts = new ArrayList<CAccount>();
         this.customers = new ArrayList<CCustomer>();
         this.operations = new ArrayList<IOperation>();
@@ -38,20 +38,15 @@ public class CBank implements IBank, IBankUtility{
         mediator.sendIOperationsList(operationsToSend, destinationBank); // Rzeczywista komunikacja odbywa siê za poœrednictwem mediatora!!!
     }
  
-    public void recieveIOperationList(List<IOperation> operationsRecieved) {
-        
+    public void recieveIOperationList(List<IOperation> operationsRecieved) 
+    {
+        this.operationsFromOtherBank = operationsRecieved;
     	return;
     }
     
-
-    public void StoreAccount(int id, int ownerID, ITransferUtility transferUtil, IAccountState type)
+    public List<IOperation> getOperationsFromOtherBank()
     {
-    	CAccount nc = new CAccount(id, ownerID, transferUtil);
-    	nc.SetState(type);
-        this.accounts.add(nc);
-
-        CCustomer c = GetCustomer(ownerID);
-        c.AddAccount(id);
+    	return this.operationsFromOtherBank;
     }
 
     public List<CCustomer> GetCustomerList()
@@ -59,9 +54,14 @@ public class CBank implements IBank, IBankUtility{
         return this.customers;
     }
 
-    public CTransferManager GetTransferManager()
+    public int CreateAccountForClient(CCustomer client, IAccountState state)
     {
-        return this.transferManager;
+    	int id= accounts.size() + 1;
+    	CAccount ac = new CAccount(id, client.GetCustomerID());
+    	accounts.add(ac);
+    	
+    	ac.SetState(state);
+    	return id;
     }
 
     public CCustomer AddCustomer(String name, String surname, int id)
@@ -69,16 +69,6 @@ public class CBank implements IBank, IBankUtility{
         CCustomer c = new CCustomer(name, surname, id, this);
         this.customers.add(c);
         return c;
-    }
-
-    public void AddTransfer(List<COperation> transfer)
-    {
-        if (transfer != null)
-        {
-            this.transferManager.makeTransfer(transfer);
-        }
-        //else
-            //throw new Exception("Transfer failed");
     }
 
     public CCustomer GetCustomer(int id)
@@ -121,6 +111,7 @@ public class CBank implements IBank, IBankUtility{
         IOperation oper = new COperationPayIn(amount, Calendar.getInstance().getTime());
         acc.DoOperation(oper);
         operations.add(oper);
+        runChainFilter(oper);
     }
 
     public void Transfer(CAccount from, CAccount to, double amount)
@@ -128,6 +119,12 @@ public class CBank implements IBank, IBankUtility{
         IOperation oper = new COperationTransfer(to, amount, Calendar.getInstance().getTime());
         from.DoOperation(oper);
         operations.add(oper);
+        runChainFilter(oper);
+    }
+    
+    public List<IOperation> getOperations()
+    {
+    	return this.operations;
     }
     
     public List<IOperation> getTransfersFromDate(Date dateFrom)

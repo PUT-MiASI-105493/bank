@@ -27,7 +27,6 @@ public class CDekoratorDebet implements IAccount
             if (accountOperation)
             {
                 operation = new COperation(ac.accountID, ac.accountID, amount);
-                ac.history.AddToHistory(operation);
             }
             return true;
         }

@@ -14,6 +14,17 @@ public class CMediatorELIXIR implements IMediatorELIXIR
  
     public void sendIOperationsList(List<IOperation> operationsList, int destinationBankID) 
     {	
-    	banks.get(destinationBankID).recieveIOperationList(operationsList);
+    	CBank b = getBank(destinationBankID);
+    	b.recieveIOperationList(operationsList);
+    }
+    
+    private CBank getBank(int destinationBankID)
+    {
+    	return banks.get(destinationBankID);
+    }
+    
+    public int getBanksListCount()
+    {
+    	return banks.size();
     }
 }
