@@ -5,28 +5,45 @@ import java.util.Date;
 import java.util.List;
 import java.util.Calendar;
 
-public class CBank implements IBank, IBankUtility{
-    private List<CAccount> accounts;
-    private List<CCustomer> customers;
+import DI.AppInjector;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+
+public class CBank implements IBank, IBankUtility
+{	
+    private List<IAccount> accounts;
+    private List<ICustomer> customers;
     private List<IOperation> operations;
     private List<IOperation> operationsFromOtherBank;
     private int id;
-    private CMediatorELIXIR mediator;
+    private IMediatorELIXIR mediator;
     
 	CChainFilterHandle chainBegin;
 	CChainFilterHandle chainEnd;
 
-    public CBank(int id, CMediatorELIXIR mediator)
+	@Inject
+	public CBank()
     {
-        this.mediator = mediator;
-        this.accounts = new ArrayList<CAccount>();
-        this.customers = new ArrayList<CCustomer>();
+        this.accounts = new ArrayList<IAccount>();
+        this.customers = new ArrayList<ICustomer>();
         this.operations = new ArrayList<IOperation>();
-        this.id = id;
-        
+
         setChainFilter();
     }
-    
+		
+    public void setMediator(IMediatorELIXIR med)
+    {
+    	this.mediator = med;
+    }
+	
+    public void setId(int id)
+    {
+    	this.id = id;
+    }
+	
     
     public void registerMediatorELIXIR(CMediatorELIXIR mediator)
     {
@@ -49,31 +66,40 @@ public class CBank implements IBank, IBankUtility{
     	return this.operationsFromOtherBank;
     }
 
-    public List<CCustomer> GetCustomerList()
+    public List<ICustomer> GetCustomerList()
     {
         return this.customers;
     }
 
-    public int CreateAccountForClient(CCustomer client, IAccountState state)
+    public int CreateAccountForClient(ICustomer client, IAccountState state)
     {
     	int id= accounts.size() + 1;
-    	CAccount ac = new CAccount(id, client.GetCustomerID());
-    	accounts.add(ac);
     	
-    	ac.SetState(state);
+    	Injector in = Guice.createInjector(new AppInjector());
+		IAccount account = in.getInstance(IAccount.class);
+		account.setAccountID(id);
+		account.setOwnerID(client.GetCustomerID());
+    	accounts.add(account);
+    	
+    	account.SetState(state);
     	return id;
     }
 
-    public CCustomer AddCustomer(String name, String surname, int id)
+    public ICustomer AddCustomer(String name, String surname, int id)
     {
-        CCustomer c = new CCustomer(name, surname, id, this);
+    	Injector in = Guice.createInjector(new AppInjector());
+    	ICustomer c = in.getInstance(ICustomer.class);
+		c.setName(name);
+		c.setSurname(surname);
+		c.setID(id);
+    	
         this.customers.add(c);
         return c;
     }
 
-    public CCustomer GetCustomer(int id)
+    public ICustomer GetCustomer(int id)
     {
-        for(CCustomer v : this.customers)
+        for(ICustomer v : this.customers)
         {
             if (v.GetCustomerID() == id)
                 return v;
@@ -83,7 +109,7 @@ public class CBank implements IBank, IBankUtility{
 
     public boolean CheckAccID(int id)
     {
-        for(CAccount v : this.accounts)
+        for(IAccount v : this.accounts)
         {
             if (v.GetAccountID() == id)
                 return false;
@@ -96,9 +122,9 @@ public class CBank implements IBank, IBankUtility{
         return this.id;
     }
 
-    public CAccount GetAccount(int id)
+    public IAccount GetAccount(int id)
     {
-        for(CAccount v : this.accounts)
+        for(IAccount v : this.accounts)
         {
             if (v.GetAccountID() == id)
                 return v;
@@ -106,7 +132,7 @@ public class CBank implements IBank, IBankUtility{
         return null;
     }
 
-    public void PayIn(CAccount acc, double amount)
+    public void PayIn(IAccount acc, double amount)
     {
         IOperation oper = new COperationPayIn(amount, Calendar.getInstance().getTime());
         acc.DoOperation(oper);
@@ -114,7 +140,7 @@ public class CBank implements IBank, IBankUtility{
         runChainFilter(oper);
     }
 
-    public void Transfer(CAccount from, CAccount to, double amount)
+    public void Transfer(IAccount from, IAccount to, double amount)
     {
         IOperation oper = new COperationTransfer(to, amount, Calendar.getInstance().getTime());
         from.DoOperation(oper);
@@ -157,34 +183,14 @@ public class CBank implements IBank, IBankUtility{
  	   return ret;   
     }
     
-    public boolean tryWithDrawNormal(double money, int accountID)
-    {
-    	boolean flag = true;
-    	int i=0;
-    	CAccount ac = null;;
-    	while(flag || i==accounts.size())
-    	{
-    		if(accounts.get(i).accountID == accountID)
-    		{
-    			flag = false;
-    			ac = accounts.get(i);
-    		}
-    		else
-    			i+=1;
-    	}
-    	
-    	return ac.WithDraw(money, true);
-    	
-    }
-    
     public boolean tryWithDrawDecorator(double money, int accountID)
     {
     	boolean flag = true;
     	int i=0;
-    	CAccount ac = null;;
+    	IAccount ac = null;;
     	while(flag || i==accounts.size())
     	{
-    		if(accounts.get(i).accountID == accountID)
+    		if(accounts.get(i).GetAccountID() == accountID)
     		{
     			flag = false;
     			ac = accounts.get(i);
@@ -208,4 +214,35 @@ public class CBank implements IBank, IBankUtility{
     {
     	chainBegin.handle(o);
     }
+    
+    public CChainFilterHandle getChainBegin()
+    {
+    	return this.chainBegin;
+    }
+    
+    public CChainFilterHandle getChainEnd()
+    {
+    	return this.chainEnd;
+    }
+
+	@Override
+	public boolean tryWithDrawNormal(double money, int accountID) 
+	{
+	    	boolean flag = true;
+	    	int i=0;
+	    	IAccount ac = null;;
+	    	while(flag || i==accounts.size())
+	    	{
+	    		if(accounts.get(i).GetAccountID() == accountID)
+	    		{
+	    			flag = false;
+	    			ac = accounts.get(i);
+	    		}
+	    		else
+	    			i+=1;
+	    	}
+	    	
+	    	return ac.WithDraw(money, true);    	
+	}
+    
 }

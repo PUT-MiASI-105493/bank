@@ -2,7 +2,7 @@ package bank;
 
 public interface IOperation 
 {
-	void execute(CAccount acc);
+	void execute(IAccount acc);
 	
     public double getAmount();
 	public abstract boolean accept(IRaport v);

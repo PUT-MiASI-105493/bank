@@ -1,20 +1,45 @@
 package bank;
 
-public class CAccount implements IAccount{
+import DI.AppInjector;
+import DI.TestInjector;
+
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.assistedinject.Assisted;
+
+public class CAccount implements IAccount
+{
+	private Injector inject;
     protected int accountID;
     protected double saldo;
     private int ownerID;
-    protected CHistory history;
+    protected IHistory history;
     public IAccountState state;
 
-    public CAccount(int id, int ownerID)
+    @Inject
+    public CAccount()
     {
-        this.history = new CHistory();
         this.saldo = 0;
-        this.accountID = id;
-        this.ownerID = ownerID;
 
         state = new CAccountStateA();
+        setHistory();
+    }
+    
+    public void setAccountID(int id)
+    {
+    	this.accountID=id;
+    }
+    
+    public void setOwnerID(int id)
+    {
+    	this.ownerID=id;
+    }
+    
+    private void setHistory()
+    {
+    	Injector inject = Guice.createInjector(new AppInjector());	
+    	this.history = inject.getInstance(IHistory.class);
     }
 
     public void SetState(IAccountState newState)
@@ -23,6 +48,11 @@ public class CAccount implements IAccount{
         	state = newState;
     }
 
+    public IAccountState getState()
+    {
+    	return this.state;
+    }
+    
     public void request()
     {
         this.saldo += state.setInterest(this);
@@ -40,7 +70,7 @@ public class CAccount implements IAccount{
 
     public CHistory GetHistory()
     {
-        return this.history;
+        return (CHistory)this.history;
     }
 
     public void addMoney(double amount)
@@ -85,7 +115,5 @@ public class CAccount implements IAccount{
             this.saldo += amount;
             operation = new COperation(this.accountID, this.accountID, amount);
         }
-        //else
-          //  throw new Exception("Amount must be a positive value.");
     }
 }

@@ -21,7 +21,7 @@ public class COperationPayIn implements IOperation
     	return amount;
     }
 
-    public void execute(CAccount acc)
+    public void execute(IAccount acc)
     {
         acc.addMoney(amount);
     }

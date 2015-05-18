@@ -4,21 +4,40 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class CCustomer 
+import com.google.inject.Inject;
+
+public class CCustomer implements ICustomer
 {
     private String name;
     private String surname; 
     private int id;
     private List<Integer> accountsID;
-    private CBank bank;
+    private IBank bank;
 
-    public CCustomer(String name, String surname, int id, CBank bankInstance)
+    @Inject
+    public CCustomer()
     {
         this.accountsID = new ArrayList<Integer>();
-        this.name = name;
-        this.surname = surname;
-        this.id = id;
-        this.bank = bankInstance;
+    }
+    
+    public void setName(String name)
+    {
+    	this.name=name;
+    }
+    
+    public void setSurname(String surname)
+    {
+    	this.surname=surname;
+    }
+    
+    public void setID(int id)
+    {
+    	this.id=id;
+    }
+    
+    public void setBank(IBank bank)
+    {
+    	this.bank = bank;
     }
 
    public int GetCustomerID()

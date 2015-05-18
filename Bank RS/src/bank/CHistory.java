@@ -3,10 +3,13 @@ package bank;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.inject.Inject;
+
 public class CHistory implements IHistory
 {
     private List<IOperation> operations;
 
+    @Inject
     public CHistory()
     {
         this.operations = new ArrayList<IOperation>();

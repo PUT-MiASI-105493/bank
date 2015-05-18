@@ -6,21 +6,37 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import DI.TestInjector;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+
 public class CMediatorELIXIRTest {
-	private CBank bank;
-	private CBank otherBank;
-	private CMediatorELIXIR med;
+	private IBank bank;
+	private IBank otherBank;
+	private IMediatorELIXIR med;
 	private int bankID;
 	private int otherBankID;
+	private Injector inject;
 	
 	@Before
 	public void setUp() throws Exception 
-	{
+	{	
 		bankID=1;
 		otherBankID=2;
-		med = new CMediatorELIXIR();
-		bank = new CBank(bankID,med);
-		otherBank = new CBank(otherBankID,med);
+		inject = Guice.createInjector(new TestInjector());
+		
+		med = inject.getInstance(IMediatorELIXIR.class);
+		
+		bank = inject.getInstance(IBank.class);
+		bank.setMediator(med);
+		bank.setId(bankID);
+		
+		otherBank = inject.getInstance(IBank.class);
+		otherBank.setMediator(med);
+		otherBank.setId(otherBankID);	
 	}
 
 	@After
@@ -34,24 +50,24 @@ public class CMediatorELIXIRTest {
 	@Test
 	public void testRegisterNewBank() 
 	{
-		med.registerNewBank(bank);
+		med.registerNewBank((CBank)bank);
 		assertEquals(1, med.getBanksListCount());
 		
-		med.registerNewBank(otherBank);
+		med.registerNewBank((CBank)otherBank);
 		assertEquals(2, med.getBanksListCount());
 	}
 
 	@Test
 	public void testSendIOperationsList() 
 	{
-		med.registerNewBank(bank);
+		med.registerNewBank((CBank)bank);
 		assertEquals(1, med.getBanksListCount());
 		
-		med.registerNewBank(otherBank);
+		med.registerNewBank((CBank)otherBank);
 		assertEquals(2, med.getBanksListCount());
 		
-		CCustomer client1 = bank.AddCustomer("Jan", "Kowalski", 1);
-		CCustomer client2 = otherBank.AddCustomer("Adam", "Nowak", 2);
+		ICustomer client1 = bank.AddCustomer("Jan", "Kowalski", 1);
+		ICustomer client2 = otherBank.AddCustomer("Adam", "Nowak", 2);
 	
 		int addID1 = bank.CreateAccountForClient(client1, new CAccountStateA());
 		int addID2 = otherBank.CreateAccountForClient(client2, new CAccountStateB());

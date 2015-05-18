@@ -9,20 +9,30 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import DI.TestInjector;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+
 public class CHistoryTest {
 
-	private CHistory history;
+	private IHistory history;
 	private COperationPayIn payin;
 	private COperationTransfer transf;
 	private double amount;
 	private Date date;
+	private Injector inject;
 	
 	@Before
 	public void setUp() throws Exception 
 	{
-		history = new CHistory();
+		inject = Guice.createInjector(new TestInjector());	
+		history = inject.getInstance(IHistory.class);
 		date = Calendar.getInstance().getTime();
-		CAccount acc = new CAccount(1, 1);
+		
+		IAccount acc = inject.getInstance(IAccount.class);
+		acc.setAccountID(1);
+		acc.setOwnerID(1);
 		payin = new COperationPayIn(amount, date);
 		transf = new COperationTransfer(acc, amount, date);
 	}

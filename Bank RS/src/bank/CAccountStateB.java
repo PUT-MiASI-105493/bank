@@ -19,7 +19,7 @@ public class CAccountStateB implements IAccountState
         threshold_2 = 5000;
     }
 
-    public double setInterest(CAccount account)
+    public double setInterest(IAccount account)
     {
     	double balance = account.GetBalance();
 
@@ -33,7 +33,5 @@ public class CAccountStateB implements IAccountState
         }
         else
             return balance * intrests_3;
-        
-        //throw new Exception("Achtung! Problemen!");
     }
 }

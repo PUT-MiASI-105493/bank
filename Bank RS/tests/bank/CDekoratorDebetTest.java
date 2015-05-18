@@ -6,19 +6,25 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import DI.TestInjector;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+
 public class CDekoratorDebetTest 
 {
-	private CCustomer client1;
-	private CCustomer client2;
-	private CBank bank;
-	private CBank otherBank;
-	CMediatorELIXIR med;
+	private ICustomer client1;
+	private ICustomer client2;
+	private IBank bank;
+	private IBank otherBank;
+	IMediatorELIXIR med;
 	int addID1;
 	int addID2;
 	int clientID1;
 	int clientID2;
 	int bankID;
 	int otherBankID;
+	public Injector inject;
 
 	@Before
 	public void setUp() throws Exception 
@@ -27,9 +33,17 @@ public class CDekoratorDebetTest
 		otherBankID=2;
 		clientID1=1;
 		clientID2=2;
-		med = new CMediatorELIXIR();
-		bank = new CBank(bankID,med);
-		otherBank = new CBank(otherBankID,med);
+		
+		inject = Guice.createInjector(new TestInjector());		
+		med = inject.getInstance(IMediatorELIXIR.class);		
+		bank = inject.getInstance(IBank.class);
+		bank.setMediator(med);
+		bank.setId(bankID);
+		
+		otherBank = inject.getInstance(IBank.class);
+		otherBank.setMediator(med);
+		otherBank.setId(otherBankID);
+		
 		med.registerNewBank(bank);
 		med.registerNewBank(otherBank);
 		
@@ -55,7 +69,7 @@ public class CDekoratorDebetTest
 	@Test
 	public void testWithDraw() 
 	{
-		CAccount  acc = bank.GetAccount(addID1);
+		IAccount  acc = bank.GetAccount(addID1);
 		acc.addMoney(200);
 		bank.tryWithDrawDecorator(100, addID1);
 		assertEquals(100, acc.GetBalance(),0.01);
@@ -64,7 +78,7 @@ public class CDekoratorDebetTest
 	@Test
 	public void testGetBalance() 
 	{
-		CAccount  acc = bank.GetAccount(addID1);
+		IAccount  acc = bank.GetAccount(addID1);
 		acc.addMoney(200);
 		CDekoratorDebet db = new CDekoratorDebet(acc);
 		assertEquals(200, db.GetBalance(),0.01);

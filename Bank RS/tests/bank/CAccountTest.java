@@ -9,24 +9,37 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import DI.TestInjector;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+
 public class CAccountTest 
 {
 	int accID;
 	int clientID;
-	private CAccount account;
-	private CBank bank;
-	CMediatorELIXIR med;
+	private IAccount account;
+	private IBank bank;
+	IMediatorELIXIR med;
 	int bankID;
+	private Injector inject;
 	
 	@Before
 	public void setUp() throws Exception 
 	{
 		bankID=1;
-		med = new CMediatorELIXIR();
-		bank = new CBank(bankID,med);
+		inject = Guice.createInjector(new TestInjector());		
+		med = inject.getInstance(IMediatorELIXIR.class);		
+		bank = inject.getInstance(IBank.class);
+		bank.setMediator(med);
+		bank.setId(bankID);
+		
 		accID=1;
 		clientID=1;
-		account = new CAccount(accID, clientID);	
+			
+		account = inject.getInstance(IAccount.class);
+		account.setAccountID(accID);
+		account.setOwnerID(clientID);
 	}
 
 	@After
@@ -41,10 +54,10 @@ public class CAccountTest
 		CAccountStateA sta = new CAccountStateA();
 		CAccountStateB stb = new CAccountStateB();
 		account.SetState(sta);
-		assertEquals(sta, account.state);
+		assertEquals(sta, account.getState());
 		
 		account.SetState(stb);
-		assertEquals(stb, account.state);
+		assertEquals(stb, account.getState());
 	}
 
 	@Test
@@ -83,13 +96,13 @@ public class CAccountTest
 	@Test
 	public void testGetHistory() 
 	{
-		CCustomer client = bank.AddCustomer("Jan", "Kowalski", 3);
+		ICustomer client = bank.AddCustomer("Jan", "Kowalski", 3);
 		
 		int accID = bank.CreateAccountForClient(client, new CAccountStateA());
 		
 		client.AddAccount(accID);
 
-		CAccount acc = bank.GetAccount(accID);
+		IAccount acc = bank.GetAccount(accID);
 		bank.PayIn(acc, 100);
 		assertNotNull(acc.GetHistory());		
 	}

@@ -10,16 +10,22 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import DI.TestInjector;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+
 public class CCustomerTest {
-	private CCustomer client1;
-	private CCustomer client2;
-	private CBank bank;
-	CMediatorELIXIR med;
+	private ICustomer client1;
+	private ICustomer client2;
+	private IBank bank;
+	IMediatorELIXIR med;
 	int addID1;
 	int addID2;
 	int clientID1;
 	int clientID2;
 	int bankID;
+	private Injector inject;
 	
 	@Before
 	public void setUp() throws Exception 
@@ -27,8 +33,12 @@ public class CCustomerTest {
 		bankID=1;
 		clientID1=1;
 		clientID2=2;
-		med = new CMediatorELIXIR();
-		bank = new CBank(bankID,med);
+
+		inject = Guice.createInjector(new TestInjector());		
+		med = inject.getInstance(IMediatorELIXIR.class);		
+		bank = inject.getInstance(IBank.class);
+		bank.setMediator(med);
+		bank.setId(bankID);
 		med.registerNewBank(bank);
 		
 		client1 = bank.AddCustomer("Jan", "Kowalski", clientID1);
@@ -54,20 +64,6 @@ public class CCustomerTest {
 	public void testGetCustomerID() 
 	{
 		assertEquals(clientID1, client1.GetCustomerID());
-	}
-
-
-	@Test
-	public void testTryWithDrawNormal() 
-	{
-		CAccount acc = bank.GetAccount(addID1);
-		acc.addMoney(1000);
-		
-		client1.tryWithDrawNormal(500, addID1);
-		
-		assertEquals(acc.GetBalance(), 500, 0.01);
-		
-		client1.tryWithDrawNormal(500, addID1);
 	}
 
 }

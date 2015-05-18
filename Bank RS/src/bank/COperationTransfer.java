@@ -6,11 +6,11 @@ import java.util.List;
 public class COperationTransfer implements IOperation
 {
     private double amount;
-    CAccount dest;
+    IAccount dest;
     public Date dateOrder;
     public boolean disposed;
 
-    public COperationTransfer(CAccount to, double amount, Date order)
+    public COperationTransfer(IAccount to, double amount, Date order)
     {
         this.amount = amount;
         this.dest = to;
@@ -23,7 +23,7 @@ public class COperationTransfer implements IOperation
     	return amount;
     }
     
-    public void execute(CAccount from)
+    public void execute(IAccount from)
     {
         from.substrMoney(amount);
         dest.addMoney(amount);

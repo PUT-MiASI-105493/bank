@@ -10,18 +10,24 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import DI.TestInjector;
+
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+
 public class CBankTest {
-	private CCustomer client1;
-	private CCustomer client2;
-	private CBank bank;
-	private CBank otherBank;
-	CMediatorELIXIR med;
+	private ICustomer client1;
+	private ICustomer client2;
+	private IBank bank;
+	private IBank otherBank;
+	IMediatorELIXIR med;
 	int addID1;
 	int addID2;
 	int clientID1;
 	int clientID2;
 	int bankID;
 	int otherBankID;
+	private Injector inject;
 	
 	@Before
 	public void setUp() throws Exception 
@@ -30,9 +36,17 @@ public class CBankTest {
 		otherBankID=2;
 		clientID1=1;
 		clientID2=2;
-		med = new CMediatorELIXIR();
-		bank = new CBank(bankID,med);
-		otherBank = new CBank(otherBankID,med);
+
+		inject = Guice.createInjector(new TestInjector());		
+		med = inject.getInstance(IMediatorELIXIR.class);		
+		bank = inject.getInstance(IBank.class);
+		bank.setMediator(med);
+		bank.setId(bankID);
+		
+		otherBank = inject.getInstance(IBank.class);
+		otherBank.setMediator(med);
+		otherBank.setId(otherBankID);
+		
 		med.registerNewBank(bank);
 		med.registerNewBank(otherBank);
 		
@@ -115,7 +129,7 @@ public class CBankTest {
 	@Test
 	public void testPayIn() 
 	{
-		CAccount  acc = bank.GetAccount(addID1);
+		IAccount  acc = bank.GetAccount(addID1);
 		bank.PayIn(acc, 100);
 		assertNotNull(bank.getOperations());
 	}
@@ -123,8 +137,8 @@ public class CBankTest {
 	@Test
 	public void testTransfer() 
 	{
-		CAccount  acc = bank.GetAccount(addID1);
-		CAccount  acc2 = bank.GetAccount(addID2);
+		IAccount  acc = bank.GetAccount(addID1);
+		IAccount  acc2 = bank.GetAccount(addID2);
 		bank.Transfer(acc, acc2, 100);
 		assertNotNull(bank.getOperations());
 	}
@@ -142,7 +156,7 @@ public class CBankTest {
 		assertNotNull(client1);
 		assertNotNull(client2);
 		
-		CAccount acc = bank.GetAccount(addID1);
+		IAccount acc = bank.GetAccount(addID1);
 		acc.addMoney(1000);
 		assertNotEquals(bank.GetAccount(addID1).GetBalance(),0);
 		
@@ -159,7 +173,7 @@ public class CBankTest {
 		assertNotNull(client1);
 		assertNotNull(client2);
 		
-		CAccount acc = bank.GetAccount(addID1);
+		IAccount acc = bank.GetAccount(addID1);
 		acc.addMoney(1000);
 		assertNotEquals(bank.GetAccount(addID1).GetBalance(),0);
 		
@@ -181,7 +195,7 @@ public class CBankTest {
 		assertNotNull(client1);
 		assertNotNull(client2);
 		
-		CAccount acc = bank.GetAccount(addID1);
+		IAccount acc = bank.GetAccount(addID1);
 		acc.addMoney(1000);
 		assertNotEquals(bank.GetAccount(addID1).GetBalance(),0);
 		
@@ -194,8 +208,8 @@ public class CBankTest {
 	public void testSetChainFilter() 
 	{
 		bank.setChainFilter();
-		assertNotNull(bank.chainEnd);
-		assertNotNull(bank.chainBegin);
+		assertNotNull(bank.getChainBegin());
+		assertNotNull(bank.getChainEnd());
 	}
 
 	@Test
@@ -203,7 +217,7 @@ public class CBankTest {
 	{
 		List<IOperation> list;
 		
-		CAccount acc = bank.GetAccount(addID1);
+		IAccount acc = bank.GetAccount(addID1);
 		acc.addMoney(5000);
 		assertNotEquals(bank.GetAccount(addID1).GetBalance(),0);
 		

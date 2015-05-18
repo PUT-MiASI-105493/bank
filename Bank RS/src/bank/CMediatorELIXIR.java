@@ -3,22 +3,25 @@ package bank;
 import java.util.HashMap;
 import java.util.List;
 
+import com.google.inject.Singleton;
+
+@Singleton
 public class CMediatorELIXIR implements IMediatorELIXIR
 {
-    private HashMap<Integer, CBank> banks = new HashMap<Integer, CBank>();
+    private HashMap<Integer, IBank> banks = new HashMap<Integer, IBank>();
     
-    public void registerNewBank(CBank k) {
+    public void registerNewBank(IBank k) {
         k.registerMediatorELIXIR(this);
         banks.put(k.GetBankID(), k);
     }
  
     public void sendIOperationsList(List<IOperation> operationsList, int destinationBankID) 
     {	
-    	CBank b = getBank(destinationBankID);
+    	IBank b = getBank(destinationBankID);
     	b.recieveIOperationList(operationsList);
     }
     
-    private CBank getBank(int destinationBankID)
+    private IBank getBank(int destinationBankID)
     {
     	return banks.get(destinationBankID);
     }
