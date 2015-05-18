@@ -5,11 +5,16 @@ import static org.junit.Assert.*;
 import java.util.Calendar;
 import java.util.Date;
 
+import operation.COperationPayIn;
+import operation.COperationTransfer;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import DI.TestInjector;
+import account.IAccount;
+import account.IHistory;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -32,7 +37,6 @@ public class CHistoryTest {
 		
 		IAccount acc = inject.getInstance(IAccount.class);
 		acc.setAccountID(1);
-		acc.setOwnerID(1);
 		payin = new COperationPayIn(amount, date);
 		transf = new COperationTransfer(acc, amount, date);
 	}

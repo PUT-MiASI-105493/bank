@@ -1,9 +1,17 @@
 package DI;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
 
-import bank.*;
+import customer.CCustomer;
+import customer.ICustomer;
+import elixir.CMediatorELIXIR;
+import elixir.IMediatorELIXIR;
+import account.CAccount;
+import account.CHistory;
+import account.IAccount;
+import account.IHistory;
+import bank.CBank;
+import bank.IBank;
 
 public class TestInjector extends AbstractModule
 {

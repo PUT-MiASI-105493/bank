@@ -6,14 +6,22 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import operation.IOperation;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import DI.TestInjector;
+import account.CAccountStateA;
+import account.CAccountStateB;
+import account.IAccount;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+
+import customer.ICustomer;
+import elixir.IMediatorELIXIR;
 
 public class CBankTest {
 	private ICustomer client1;
@@ -186,8 +194,7 @@ public class CBankTest {
 	public void testGetTransfersGreatherThan() 
 	{
 		List<IOperation> list;
-		Date fromDate = Calendar.getInstance().getTime();
-		
+
 		Calendar calendar = Calendar.getInstance();
 		calendar.add(Calendar.HOUR_OF_DAY, 4);
 		calendar.getTime();
@@ -215,8 +222,6 @@ public class CBankTest {
 	@Test
 	public void testRunChainFilter() 
 	{
-		List<IOperation> list;
-		
 		IAccount acc = bank.GetAccount(addID1);
 		acc.addMoney(5000);
 		assertNotEquals(bank.GetAccount(addID1).GetBalance(),0);

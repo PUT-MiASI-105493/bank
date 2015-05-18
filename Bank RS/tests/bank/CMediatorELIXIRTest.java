@@ -7,11 +7,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import DI.TestInjector;
+import account.CAccountStateA;
+import account.CAccountStateB;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
-import com.google.inject.Inject;
 import com.google.inject.Injector;
+
+import customer.ICustomer;
+import elixir.IMediatorELIXIR;
 
 public class CMediatorELIXIRTest {
 	private IBank bank;

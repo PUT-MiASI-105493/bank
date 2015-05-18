@@ -2,18 +2,19 @@ package bank;
 
 import static org.junit.Assert.*;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import DI.TestInjector;
+import account.CAccountStateA;
+import account.CAccountStateB;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+
+import customer.ICustomer;
+import elixir.IMediatorELIXIR;
 
 public class CCustomerTest {
 	private ICustomer client1;

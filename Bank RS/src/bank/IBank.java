@@ -3,6 +3,14 @@ package bank;
 import java.util.Date;
 import java.util.List;
 
+import customer.ICustomer;
+import account.IAccount;
+import account.IAccountState;
+import operation.IOperation;
+import chainFilter.CChainFilterHandle;
+import elixir.CMediatorELIXIR;
+import elixir.IMediatorELIXIR;
+
 public interface IBank 
 {
     public void setMediator(IMediatorELIXIR med);

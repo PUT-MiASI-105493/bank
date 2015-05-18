@@ -5,14 +5,22 @@ import static org.junit.Assert.*;
 import java.util.Calendar;
 import java.util.Date;
 
+import operation.COperationPayIn;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import DI.TestInjector;
+import account.CAccountStateA;
+import account.CAccountStateB;
+import account.IAccount;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+
+import customer.ICustomer;
+import elixir.IMediatorELIXIR;
 
 public class CAccountTest 
 {
@@ -39,7 +47,6 @@ public class CAccountTest
 			
 		account = inject.getInstance(IAccount.class);
 		account.setAccountID(accID);
-		account.setOwnerID(clientID);
 	}
 
 	@After

@@ -5,14 +5,30 @@ import java.util.Date;
 import java.util.List;
 import java.util.Calendar;
 
+import operation.COperationPayIn;
+import operation.COperationTransfer;
+import operation.IOperation;
+import raport.CRaportPayInsGreaterThan;
+import raport.CRaportTransferOnly;
+import raport.CRaportTransfersGreaterThan;
+import raport.IRaport;
 import DI.AppInjector;
+import account.CDekoratorDebet;
+import account.IAccount;
+import account.IAccountState;
+import chainFilter.CChainFilterHandle;
+import chainFilter.CChainFilterHighIOperation;
+import chainFilter.CChainFilterSameOperations;
 
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 
-public class CBank implements IBank, IBankUtility
+import customer.ICustomer;
+import elixir.CMediatorELIXIR;
+import elixir.IMediatorELIXIR;
+
+public class CBank implements IBank
 {	
     private List<IAccount> accounts;
     private List<ICustomer> customers;
@@ -78,7 +94,6 @@ public class CBank implements IBank, IBankUtility
     	Injector in = Guice.createInjector(new AppInjector());
 		IAccount account = in.getInstance(IAccount.class);
 		account.setAccountID(id);
-		account.setOwnerID(client.GetCustomerID());
     	accounts.add(account);
     	
     	account.SetState(state);
